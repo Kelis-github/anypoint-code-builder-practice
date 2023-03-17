@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="35ed1c7d-0023-49a4-a54f-aae96ca1f810" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="9134bc48-54ff-4277-a67b-8fb85414ec5d" />
+	<flow name="currrent-time-appFlow" doc:id="02100eda-efc3-4e1c-ab1f-6190660c8078" >
+		<http:listener doc:name="Listener" doc:id="7d4506dc-f3a9-46ee-a1ed-abc29b100760" config-ref="HTTP_Listener_config" path="/currenttime"/>
+		<ee:transform doc:name="Transform Message" doc:id="34eb1c75-915e-421d-a73b-192183bb0ab4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"time": now(),
+	"msg": "App-3 deployed via Connected-app Successfuly!"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<os:store doc:name="Store" doc:id="d0fe6fcf-168d-46f1-9c65-692e2eaf13f7" key="kekeKey" objectStore="Object_store"/>
+		<logger level="INFO" doc:name="Logger" doc:id="8eca6fd5-873b-4c7e-bad3-079b4cef249d" message="#[payload]"/>
+		<os:retrieve doc:name="Retrieve" doc:id="5ae74373-a79f-4397-b2b5-5e135eb978b8" key="kekeKey" objectStore="Object_store" />
+		<logger level="INFO" doc:name="Logger" doc:id="8d494daa-d9e3-4f76-8465-943158c90d10" message="#[payload]"/>
+	
+</flow>
+
+</mule>
